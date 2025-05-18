@@ -113,7 +113,7 @@ class SkipButtonFinder:
         Returns:
             bool: True если кнопка найдена и нажата
         """
-        from utils.config import OCR_REGIONS, SKIP_BUTTON_VARIANTS
+        from config import OCR_REGIONS, SKIP_BUTTON_VARIANTS
 
         # Список областей для поиска (от узкой к широкой)
         search_regions = [
@@ -159,7 +159,7 @@ class SkipButtonFinder:
         Returns:
             bool: True если кнопка найдена и нажата
         """
-        from utils.config import OCR_REGIONS, SKIP_BUTTON_VARIANTS
+        from config import OCR_REGIONS, SKIP_BUTTON_VARIANTS
 
         screenshot = self.adb.screenshot()
         if screenshot is None or screenshot.size == 0:

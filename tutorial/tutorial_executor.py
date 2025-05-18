@@ -259,7 +259,7 @@ class TutorialExecutor:
 
     def _determine_season_for_server(self, server_id: int) -> str:
         """Определение сезона для сервера."""
-        from utils.config import SEASONS
+        from config import SEASONS
 
         for season_id, season_data in SEASONS.items():
             if season_data['min_server'] >= server_id >= season_data['max_server']:
@@ -342,7 +342,7 @@ class TutorialExecutor:
 
     def _click_server_at_coordinates(self, coords: tuple) -> None:
         """Клик по серверу с паузами."""
-        from utils.config import PAUSE_SETTINGS
+        from config import PAUSE_SETTINGS
 
         time.sleep(PAUSE_SETTINGS['before_server_click'])
         self.interface.click_coord(coords[0], coords[1])

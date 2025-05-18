@@ -9,7 +9,7 @@ import logging
 import time
 from typing import Optional, List, Tuple, Dict
 
-from utils.config import SEASONS, COORDINATES, PAUSE_SETTINGS, OCR_REGIONS, SERVER_RECOGNITION_SETTINGS
+from config import SEASONS, COORDINATES, PAUSE_SETTINGS, OCR_REGIONS, SERVER_RECOGNITION_SETTINGS
 
 
 class OptimizedServerSelector:

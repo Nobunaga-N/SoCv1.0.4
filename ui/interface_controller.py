@@ -57,7 +57,7 @@ class InterfaceController:
         Returns:
             bool: True если изображение найдено и клик выполнен
         """
-        from utils.config import IMAGE_PATHS
+        from config import IMAGE_PATHS
 
         if image_key not in IMAGE_PATHS:
             self.logger.error(f"Изображение '{image_key}' не найдено в конфигурации")
@@ -76,7 +76,7 @@ class InterfaceController:
         Returns:
             tuple: координаты найденного изображения или None
         """
-        from utils.config import IMAGE_PATHS
+        from config import IMAGE_PATHS
 
         if image_key not in IMAGE_PATHS:
             self.logger.error(f"Изображение '{image_key}' не найдено в конфигурации")
@@ -130,7 +130,7 @@ class InterfaceController:
 
     def start_app(self) -> None:
         """Запуск игры."""
-        from utils.config import GAME_PACKAGE, GAME_ACTIVITY, LOADING_TIMEOUT
+        from config import GAME_PACKAGE, GAME_ACTIVITY, LOADING_TIMEOUT
 
         self.logger.info("Запуск игры")
         self.adb.start_app(GAME_PACKAGE, GAME_ACTIVITY)
@@ -138,7 +138,7 @@ class InterfaceController:
 
     def stop_app(self) -> None:
         """Остановка игры."""
-        from utils.config import GAME_PACKAGE
+        from config import GAME_PACKAGE
 
         self.logger.info("Остановка игры")
         self.adb.stop_app(GAME_PACKAGE)

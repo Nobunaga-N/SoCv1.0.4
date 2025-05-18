@@ -11,7 +11,7 @@ import os
 import tempfile
 from io import BytesIO
 
-from utils.config import DEFAULT_TIMEOUT, LOADING_TIMEOUT, GAME_PACKAGE, GAME_ACTIVITY
+from config import DEFAULT_TIMEOUT, LOADING_TIMEOUT, GAME_PACKAGE, GAME_ACTIVITY
 
 class ADBController:
     """Класс для взаимодействия с устройством через ADB."""

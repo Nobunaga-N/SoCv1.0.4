@@ -6,7 +6,7 @@ import numpy as np
 import time
 import logging
 
-from utils.config import TEMPLATE_MATCHING_THRESHOLD, SCREENSHOT_TIMEOUT
+from config import TEMPLATE_MATCHING_THRESHOLD, SCREENSHOT_TIMEOUT
 
 class ImageHandler:
     """Класс для обработки изображений и поиска шаблонов на экране."""
