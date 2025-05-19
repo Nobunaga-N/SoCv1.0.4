@@ -175,9 +175,9 @@ class TutorialSteps:
 
         steps.append(TutorialStep(
             step_number=21,
-            description="Выбираем пушку - клик по (77, 276) через 1.5 секунды",
+            description="Выбираем пушку - клик по (77, 276) через 2 секунды",
             action_type="click_coord_with_delay",
-            params={"x": 77, "y": 276, "delay": 1.5}
+            params={"x": 77, "y": 276, "delay": 2}
         ))
 
         # Шаг 22: Пропустить

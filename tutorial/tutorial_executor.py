@@ -1,18 +1,19 @@
 """
 Исполнитель обучения - выполняет шаги согласно их конфигурации.
+Обновленная версия с оптимизированным поисковиком кнопки ПРОПУСТИТЬ.
 """
 import time
 import logging
 from typing import Dict, Any
 
 from .tutorial_steps import TutorialSteps, TutorialStep
-from .skip_button_finder import SkipButtonFinder
+from .skip_button_finder import UltraFastSkipButtonFinder
 
 
 class TutorialExecutor:
     """Класс для выполнения шагов обучения согласно их конфигурации."""
 
-    def __init__(self, interface_controller, ocr_handler, server_selector):
+    def __init__(self, interface_controller, ocr_handler, server_selector, debug_mode=False):
         """
         Инициализация исполнителя обучения.
 
@@ -20,12 +21,17 @@ class TutorialExecutor:
             interface_controller: контроллер интерфейса
             ocr_handler: обработчик OCR
             server_selector: селектор серверов
+            debug_mode: режим отладки для сохранения изображений
         """
         self.logger = logging.getLogger('sea_conquest_bot.tutorial_executor')
         self.interface = interface_controller
         self.ocr = ocr_handler
         self.server_selector = server_selector
-        self.skip_finder = SkipButtonFinder(interface_controller.adb, interface_controller)
+        self.skip_finder = UltraFastSkipButtonFinder(
+            interface_controller.adb,
+            interface_controller,
+            debug_mode=debug_mode
+        )
         self.tutorial_steps = TutorialSteps()
 
         # Валидация шагов при инициализации
@@ -139,11 +145,25 @@ class TutorialExecutor:
         return self._find_and_click_server(server_id)
 
     def _action_find_skip_infinite(self, wait_after: float = 0.0, **kwargs) -> bool:
-        """Бесконечный поиск кнопки ПРОПУСТИТЬ."""
+        """
+        Бесконечный поиск кнопки ПРОПУСТИТЬ с оптимизированным алгоритмом.
+
+        ВАЖНО: Этот метод НЕ завершается пока не найдет кнопку!
+        Никаких fallback-ов на координаты!
+        """
+        self.logger.info("🔍 Поиск кнопки ПРОПУСТИТЬ (обязательный поиск)")
+
         success = self.skip_finder.find_skip_button_infinite()
-        if wait_after > 0:
-            time.sleep(wait_after)
-        return success
+
+        if success:
+            self.logger.info("✅ ПРОПУСТИТЬ найден и нажат")
+            if wait_after > 0:
+                time.sleep(wait_after)
+            return True
+        else:
+            # Этого не должно произойти при бесконечном поиске
+            self.logger.error("❌ Критическая ошибка: бесконечный поиск завершился без результата")
+            return False
 
     def _action_click_with_image_check(self, image_key: str, x: int, y: int,
                                        image_timeout: int = 15, click_delay: float = 0.0, **kwargs) -> bool:
@@ -159,13 +179,19 @@ class TutorialExecutor:
         return success
 
     def _action_wait_image_then_skip(self, image_key: str, image_timeout: int = 15, **kwargs) -> bool:
-        """Ожидание изображения и затем поиск кнопки ПРОПУСТИТЬ."""
+        """
+        Ожидание изображения и затем ОБЯЗАТЕЛЬНЫЙ поиск кнопки ПРОПУСТИТЬ.
+
+        ВАЖНО: Поиск ПРОПУСТИТЬ обязательный, без fallback-ов!
+        """
+        # Ждем изображение
         if self.interface.wait_for_image(image_key, timeout=image_timeout):
-            self.logger.info(f"Изображение {image_key} найдено, ищем ПРОПУСТИТЬ")
-            return self.skip_finder.find_skip_button_infinite()
+            self.logger.info(f"Изображение {image_key} найдено, запускаем поиск ПРОПУСТИТЬ")
         else:
-            self.logger.warning(f"Изображение {image_key} не найдено, но ищем ПРОПУСТИТЬ")
-            return self.skip_finder.find_skip_button_infinite()
+            self.logger.warning(f"Изображение {image_key} не найдено, но запускаем поиск ПРОПУСТИТЬ")
+
+        # ОБЯЗАТЕЛЬНЫЙ поиск ПРОПУСТИТЬ
+        return self.skip_finder.find_skip_button_infinite()
 
     def _action_wait_for_battle_ready(self, image_key: str, max_attempts: int = 20, **kwargs) -> bool:
         """Ожидание готовности к битве."""
@@ -238,18 +264,22 @@ class TutorialExecutor:
 
     def _action_final_quest_activation(self, x: int, y: int, wait_before: float = 6,
                                        skip_timeout: int = 5, wait_after_skip: float = 4, **kwargs) -> bool:
-        """Финальная активация квеста с проверкой ПРОПУСТИТЬ."""
+        """
+        Финальная активация квеста с ОБЯЗАТЕЛЬНОЙ проверкой ПРОПУСТИТЬ.
+
+        ВАЖНО: Если ПРОПУСТИТЬ найден, то он ОБЯЗАТЕЛЬНО будет нажат!
+        """
         if wait_before > 0:
             time.sleep(wait_before)
 
         # Проверяем наличие кнопки ПРОПУСТИТЬ с ограниченным таймаутом
         if self.skip_finder.find_skip_button_with_timeout(timeout=skip_timeout):
-            self.logger.info('ПРОПУСТИТЬ найден и нажат, ждем перед активацией квеста')
+            self.logger.info('✅ ПРОПУСТИТЬ найден и нажат, ждем перед активацией квеста')
             time.sleep(wait_after_skip)
             self.interface.click_coord(x, y)
             self.logger.info('Финальный квест активирован (после ПРОПУСТИТЬ)')
         else:
-            self.logger.info('ПРОПУСТИТЬ не найден, сразу активируем финальный квест')
+            self.logger.info('ПРОПУСТИТЬ не найден за отведенное время, сразу активируем финальный квест')
             self.interface.click_coord(x, y)
             self.logger.info('Финальный квест активирован (без ПРОПУСТИТЬ)')
 
@@ -347,3 +377,27 @@ class TutorialExecutor:
         time.sleep(PAUSE_SETTINGS['before_server_click'])
         self.interface.click_coord(coords[0], coords[1])
         time.sleep(PAUSE_SETTINGS['after_server_click'])
+
+    def get_skip_finder_statistics(self) -> dict:
+        """
+        Получение статистики работы поисковика кнопки ПРОПУСТИТЬ.
+
+        Returns:
+            dict: статистика работы
+        """
+        return self.skip_finder.get_statistics()
+
+    def reset_skip_finder_statistics(self):
+        """Сброс статистики поисковика."""
+        self.skip_finder.reset_statistics()
+        self.logger.info("🔄 Статистика поисковика ПРОПУСТИТЬ сброшена")
+
+    def enable_debug_mode(self):
+        """Включение режима отладки для сохранения изображений."""
+        self.skip_finder.debug_mode = True
+        self.logger.info("🧪 Режим отладки поисковика ПРОПУСТИТЬ включен")
+
+    def disable_debug_mode(self):
+        """Отключение режима отладки."""
+        self.skip_finder.debug_mode = False
+        self.logger.info("Режим отладки поисковика ПРОПУСТИТЬ отключен")

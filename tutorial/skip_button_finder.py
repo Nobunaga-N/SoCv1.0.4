@@ -1,28 +1,58 @@
 """
-Продвинутый поиск кнопки ПРОПУСТИТЬ с множественными методами OCR.
+Супер-оптимизированный поисковик кнопки ПРОПУСТИТЬ с мгновенным распознаванием.
+Создан специально для кнопки Sea of Conquest с учетом визуальных особенностей.
 """
 import cv2
 import numpy as np
 import logging
 import time
-from typing import List, Tuple, Dict, Optional
+import os
+from typing import Optional, Tuple, List
+from pathlib import Path
 
 
-class SkipButtonFinder:
-    """Класс для поиска кнопки ПРОПУСТИТЬ с использованием различных методов OCR."""
+class UltraFastSkipButtonFinder:
+    """Супер-быстрый поисковик кнопки ПРОПУСТИТЬ с мгновенным распознаванием."""
 
-    def __init__(self, adb_controller, interface_controller):
+    def __init__(self, adb_controller, interface_controller, debug_mode=False):
         """
-        Инициализация поисковика кнопки ПРОПУСТИТЬ.
+        Инициализация супер-быстрого поисковика кнопки ПРОПУСТИТЬ.
 
         Args:
             adb_controller: контроллер ADB
             interface_controller: контроллер интерфейса
+            debug_mode: режим отладки с сохранением изображений
         """
-        self.logger = logging.getLogger('sea_conquest_bot.skip_finder')
+        self.logger = logging.getLogger('sea_conquest_bot.ultra_skip_finder')
         self.adb = adb_controller
         self.interface = interface_controller
+        self.debug_mode = debug_mode
         self.ocr_available = self._check_ocr_availability()
+
+        # Создаем папку для отладки если нужно
+        if self.debug_mode:
+            self.debug_dir = Path("debug_skip_screenshots")
+            self.debug_dir.mkdir(exist_ok=True)
+
+        # Точная область поиска кнопки (на основе скриншотов)
+        # Кнопка находится в правом верхнем углу
+        self.primary_region = (1020, 15, 240, 70)  # Основная область
+        self.fallback_region = (980, 10, 280, 80)  # Резервная область
+
+        # Варианты текста (упорядочены по вероятности)
+        self.skip_variants = [
+            "ПРОПУСТИТЬ",
+            "пропустить",
+            "Пропустить",
+            ">>",
+            "SKIP",
+            "Skip"
+        ]
+
+        # Счетчик попыток
+        self.attempt_counter = 0
+        self.total_search_time = 0
+        self.successful_searches = 0
 
     def _check_ocr_availability(self) -> bool:
         """Проверка доступности OCR."""
@@ -30,48 +60,63 @@ class SkipButtonFinder:
             import pytesseract
             return True
         except ImportError:
-            self.logger.warning("OCR не доступен")
+            self.logger.error("OCR не доступен - pytesseract не установлен")
             return False
 
     def find_skip_button_infinite(self) -> bool:
         """
-        Бесконечный поиск кнопки ПРОПУСТИТЬ с улучшенными методами OCR.
+        Супер-быстрый бесконечный поиск кнопки ПРОПУСТИТЬ.
+        Оптимизирован для мгновенного распознавания.
 
         Returns:
             bool: True когда кнопка найдена и нажата
         """
-        self.logger.info("Запуск бесконечного поиска кнопки ПРОПУСТИТЬ")
+        if not self.ocr_available:
+            self.logger.error("OCR не доступен, невозможно найти кнопку ПРОПУСТИТЬ")
+            return False
 
-        attempt = 0
-        log_interval = 15  # Логируем каждые 15 попыток
+        self.logger.info("🚀 Запуск супер-быстрого поиска кнопки ПРОПУСТИТЬ")
+
+        self.attempt_counter = 0
+        start_time = time.time()
+        last_log_time = start_time
 
         while True:
-            attempt += 1
-
-            if attempt % log_interval == 1:
-                self.logger.info(f"Попытка поиска ПРОПУСТИТЬ #{attempt}")
+            self.attempt_counter += 1
+            attempt_start = time.time()
 
             try:
-                # Каждые 5 попыток используем продвинутый поиск по всем областям
-                if attempt % 5 == 0:
-                    if self._find_skip_with_advanced_ocr():
-                        self.logger.info(f"ПРОПУСТИТЬ найден продвинутым методом на попытке #{attempt}")
-                        return True
-                else:
-                    # Быстрый поиск в основной области
-                    if self._find_skip_quick_search():
-                        self.logger.info(f"ПРОПУСТИТЬ найден быстрым методом на попытке #{attempt}")
-                        return True
+                # Супер-быстрый поиск
+                coords = self._ultra_fast_search()
+
+                if coords:
+                    elapsed = time.time() - start_time
+                    self.total_search_time += elapsed
+                    self.successful_searches += 1
+                    avg_time = self.total_search_time / self.successful_searches
+
+                    self.logger.info(
+                        f"⚡ ПРОПУСТИТЬ найден за {elapsed:.2f}с на попытке {self.attempt_counter} "
+                        f"(среднее время: {avg_time:.2f}с)"
+                    )
+                    self.interface.click_coord(coords[0], coords[1])
+                    return True
 
             except Exception as e:
-                self.logger.debug(f"Ошибка в попытке #{attempt}: {e}")
+                self.logger.debug(f"Ошибка в попытке {self.attempt_counter}: {e}")
 
-            # Короткая пауза между попытками
-            time.sleep(0.3)
+            # Логируем прогресс каждые 5 секунд
+            current_time = time.time()
+            if current_time - last_log_time >= 5:
+                self.logger.info(f"🔍 Поиск продолжается... Попытка {self.attempt_counter} (время: {current_time - start_time:.1f}с)")
+                last_log_time = current_time
+
+            # Минимальная пауза между попытками
+            time.sleep(0.05)  # Еще меньше паузы для максимальной скорости
 
     def find_skip_button_with_timeout(self, timeout: int = 10) -> bool:
         """
-        Поиск кнопки ПРОПУСТИТЬ с ограничением по времени.
+        Супер-быстрый поиск кнопки ПРОПУСТИТЬ с таймаутом.
 
         Args:
             timeout: максимальное время поиска в секундах
@@ -79,428 +124,305 @@ class SkipButtonFinder:
         Returns:
             bool: True если кнопка найдена и нажата
         """
-        self.logger.info(f"Поиск кнопки ПРОПУСТИТЬ с таймаутом {timeout} сек")
+        if not self.ocr_available:
+            return False
+
+        self.logger.info(f"⚡ Супер-быстрый поиск ПРОПУСТИТЬ с таймаутом {timeout}с")
 
         start_time = time.time()
-        attempt = 0
+        self.attempt_counter = 0
 
         while time.time() - start_time < timeout:
-            attempt += 1
+            self.attempt_counter += 1
 
             try:
-                if self._find_skip_quick_search():
-                    self.logger.info(f"ПРОПУСТИТЬ найден на попытке #{attempt}")
-                    return True
+                coords = self._ultra_fast_search()
 
-                # Каждые 5 попыток используем продвинутый поиск
-                if attempt % 5 == 0:
-                    if self._find_skip_with_advanced_ocr():
-                        self.logger.info(f"ПРОПУСТИТЬ найден продвинутым методом на попытке #{attempt}")
-                        return True
+                if coords:
+                    elapsed = time.time() - start_time
+                    self.logger.info(f"⚡ ПРОПУСТИТЬ найден за {elapsed:.2f}с на попытке {self.attempt_counter}")
+                    self.interface.click_coord(coords[0], coords[1])
+                    return True
 
             except Exception as e:
-                self.logger.debug(f"Ошибка в попытке #{attempt}: {e}")
+                self.logger.debug(f"Ошибка в попытке {self.attempt_counter}: {e}")
 
-            time.sleep(0.3)
+            time.sleep(0.05)
 
-        self.logger.warning(f"ПРОПУСТИТЬ не найден за {timeout} секунд")
+        self.logger.warning(f"ПРОПУСТИТЬ не найден за {timeout}с ({self.attempt_counter} попыток)")
         return False
 
-    def _find_skip_with_advanced_ocr(self) -> bool:
+    def _ultra_fast_search(self) -> Optional[Tuple[int, int]]:
         """
-        Продвинутый поиск кнопки ПРОПУСТИТЬ с множественными методами обработки.
+        Супер-быстрый поиск кнопки ПРОПУСТИТЬ с минимальной обработкой.
 
         Returns:
-            bool: True если кнопка найдена и нажата
+            tuple: (x, y) координаты центра кнопки или None
         """
-        from config import OCR_REGIONS, SKIP_BUTTON_VARIANTS
-
-        # Список областей для поиска (от узкой к широкой)
-        search_regions = [
-            OCR_REGIONS['skip_button'],
-            OCR_REGIONS['skip_button_extended'],
-            (700, 0, 580, 150),  # Очень широкая область правого верха
-        ]
-
-        # Получаем скриншот один раз
+        # Получаем скриншот
         screenshot = self.adb.screenshot()
         if screenshot is None or screenshot.size == 0:
-            return False
+            return None
 
-        # Пробуем разные области поиска
-        for region_idx, region in enumerate(search_regions):
-            x, y, w, h = region
-            # Проверяем границы
-            x = max(0, x)
-            y = max(0, y)
-            w = min(screenshot.shape[1] - x, w)
-            h = min(screenshot.shape[0] - y, h)
+        # Сохраняем для отладки
+        if self.debug_mode and self.attempt_counter % 20 == 1:
+            self._save_debug_image(screenshot, f"original_{self.attempt_counter}.png")
 
-            if w <= 0 or h <= 0:
-                continue
+        # Сначала ищем в основной области
+        coords = self._search_in_region_ultra_fast(screenshot, self.primary_region, "primary")
+        if coords:
+            return coords
 
-            roi = screenshot[y:y + h, x:x + w]
+        # Если не найден, ищем в резервной области
+        coords = self._search_in_region_ultra_fast(screenshot, self.fallback_region, "fallback")
+        return coords
 
-            # Применяем все методы обработки для этой области
-            for method_name, method_func in self._get_ocr_methods().items():
-                result = method_func(roi, SKIP_BUTTON_VARIANTS)
-                if result:
-                    coords = (x + result[0], y + result[1])
-                    self.interface.click_coord(coords[0], coords[1])
-                    self.logger.info(f"ПРОПУСТИТЬ найден {method_name} в области {region_idx + 1}")
-                    return True
-
-        return False
-
-    def _find_skip_quick_search(self) -> bool:
+    def _search_in_region_ultra_fast(self, screenshot: np.ndarray, region: Tuple[int, int, int, int],
+                                    region_name: str) -> Optional[Tuple[int, int]]:
         """
-        Быстрый поиск только в основной области.
+        Супер-быстрый поиск в конкретной области.
+
+        Args:
+            screenshot: скриншот экрана
+            region: область поиска (x, y, w, h)
+            region_name: название области для отладки
 
         Returns:
-            bool: True если кнопка найдена и нажата
+            tuple: (x, y) координаты или None
         """
-        from config import OCR_REGIONS, SKIP_BUTTON_VARIANTS
-
-        screenshot = self.adb.screenshot()
-        if screenshot is None or screenshot.size == 0:
-            return False
-
-        # Поиск только в основной области
-        region = OCR_REGIONS['skip_button']
         x, y, w, h = region
+
+        # Проверяем границы
+        x = max(0, x)
+        y = max(0, y)
+        w = min(screenshot.shape[1] - x, w)
+        h = min(screenshot.shape[0] - y, h)
+
+        if w <= 0 or h <= 0:
+            return None
+
+        # Вырезаем область
         roi = screenshot[y:y + h, x:x + w]
 
-        # Пробуем только самые эффективные методы для скорости
-        result = self._ocr_method_inverted_binary(roi, SKIP_BUTTON_VARIANTS)
-        if result:
-            coords = (x + result[0], y + result[1])
-            self.interface.click_coord(coords[0], coords[1])
-            return True
+        # Сохраняем ROI для отладки
+        if self.debug_mode and self.attempt_counter % 20 == 1:
+            self._save_debug_image(roi, f"roi_{region_name}_{self.attempt_counter}.png")
 
-        result = self._ocr_method_standard_binary(roi, SKIP_BUTTON_VARIANTS)
-        if result:
-            coords = (x + result[0], y + result[1])
-            self.interface.click_coord(coords[0], coords[1])
-            return True
+        # Применяем только самые быстрые и эффективные методы
+        # Белый текст на темном фоне - идеальный случай для инвертированной бинаризации
+        coords = self._method_inverted_threshold(roi)
+        if coords:
+            return (x + coords[0], y + coords[1])
 
-        return False
+        # Если не найден, пробуем адаптивный порог
+        coords = self._method_adaptive_threshold(roi)
+        if coords:
+            return (x + coords[0], y + coords[1])
 
-    def _get_ocr_methods(self) -> Dict[str, callable]:
+        # Последний шанс - поиск по цвету
+        coords = self._method_color_detection(roi)
+        if coords:
+            return (x + coords[0], y + coords[1])
+
+        return None
+
+    def _method_inverted_threshold(self, roi: np.ndarray) -> Optional[Tuple[int, int]]:
         """
-        Возвращает словарь всех доступных методов OCR обработки.
+        Метод инвертированной бинаризации - самый эффективный для белого текста на темном фоне.
+
+        Args:
+            roi: область интереса
 
         Returns:
-            dict: словарь методов OCR
+            tuple: (x, y) координаты или None
         """
-        return {
-            'standard_binary': self._ocr_method_standard_binary,
-            'inverted_binary': self._ocr_method_inverted_binary,
-            'adaptive_threshold': self._ocr_method_adaptive_threshold,
-            'multi_threshold': self._ocr_method_multi_threshold,
-            'contrast_enhanced': self._ocr_method_contrast_enhanced,
-            'morphological': self._ocr_method_morphological,
-            'color_isolation': self._ocr_method_color_isolation,
-            'edge_detection': self._ocr_method_edge_detection,
-        }
-
-    def _ocr_method_standard_binary(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Стандартная бинаризация."""
         try:
             import pytesseract
+
+            # Конвертируем в оттенки серого
             gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
 
-            thresholds = [120, 150, 180, 200]
-            for threshold in thresholds:
-                _, binary = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
-                result = self._process_with_tesseract(binary, variants, scale=2)
-                if result:
-                    return result
-            return None
-        except:
+            # Инвертированная бинаризация (белый текст становится черным на белом фоне)
+            _, binary = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV)
+
+            # Сохраняем для отладки
+            if self.debug_mode and self.attempt_counter % 20 == 1:
+                self._save_debug_image(binary, f"binary_inv_{self.attempt_counter}.png")
+
+            # Быстрая конфигурация OCR
+            config = '--psm 7 --oem 3'  # PSM 7 - одна строка текста
+
+            # Получаем текст
+            text = pytesseract.image_to_string(binary, lang='rus+eng', config=config).strip()
+
+            # Проверяем совпадения
+            if self._is_skip_text(text):
+                # Возвращаем центр области
+                return (roi.shape[1] // 2, roi.shape[0] // 2)
+
             return None
 
-    def _ocr_method_inverted_binary(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Инвертированная бинаризация."""
+        except Exception as e:
+            self.logger.debug(f"Ошибка в методе инвертированного порога: {e}")
+            return None
+
+    def _method_adaptive_threshold(self, roi: np.ndarray) -> Optional[Tuple[int, int]]:
+        """
+        Метод адаптивной бинаризации.
+
+        Args:
+            roi: область интереса
+
+        Returns:
+            tuple: (x, y) координаты или None
+        """
         try:
             import pytesseract
+
             gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
 
-            thresholds = [120, 150, 180]
-            for threshold in thresholds:
-                _, binary = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY_INV)
-                result = self._process_with_tesseract(binary, variants, scale=2)
-                if result:
-                    return result
-            return None
-        except:
+            # Адаптивная бинаризация
+            adaptive = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                           cv2.THRESH_BINARY_INV, 11, 2)
+
+            # Сохраняем для отладки
+            if self.debug_mode and self.attempt_counter % 20 == 1:
+                self._save_debug_image(adaptive, f"adaptive_{self.attempt_counter}.png")
+
+            config = '--psm 7 --oem 3'
+            text = pytesseract.image_to_string(adaptive, lang='rus+eng', config=config).strip()
+
+            if self._is_skip_text(text):
+                return (roi.shape[1] // 2, roi.shape[0] // 2)
+
             return None
 
-    def _ocr_method_adaptive_threshold(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Адаптивная пороговая обработка."""
+        except Exception as e:
+            self.logger.debug(f"Ошибка в методе адаптивного порога: {e}")
+            return None
+
+    def _method_color_detection(self, roi: np.ndarray) -> Optional[Tuple[int, int]]:
+        """
+        Метод поиска по цвету - выделяем белые пиксели на темном фоне.
+
+        Args:
+            roi: область интереса
+
+        Returns:
+            tuple: (x, y) координаты или None
+        """
         try:
             import pytesseract
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
 
-            configs = [
-                (cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 11, 2),
-                (cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 15, 5),
-                (cv2.ADAPTIVE_THRESH_MEAN_C, 11, 2),
-                (cv2.ADAPTIVE_THRESH_MEAN_C, 15, 5),
-            ]
-
-            for method, block_size, c in configs:
-                binary = cv2.adaptiveThreshold(gray, 255, method, cv2.THRESH_BINARY, block_size, c)
-                result = self._process_with_tesseract(binary, variants, scale=2)
-                if result:
-                    return result
-
-                binary_inv = cv2.adaptiveThreshold(gray, 255, method, cv2.THRESH_BINARY_INV, block_size, c)
-                result = self._process_with_tesseract(binary_inv, variants, scale=2)
-                if result:
-                    return result
-            return None
-        except:
-            return None
-
-    def _ocr_method_multi_threshold(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Множественная пороговая обработка."""
-        try:
-            import pytesseract
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-
-            _, binary1 = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY)
-            _, binary2 = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
-            _, binary3 = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
-
-            combined = cv2.bitwise_or(cv2.bitwise_or(binary1, binary2), binary3)
-            result = self._process_with_tesseract(combined, variants, scale=2)
-            if result:
-                return result
-
-            combined_inv = cv2.bitwise_not(combined)
-            result = self._process_with_tesseract(combined_inv, variants, scale=2)
-            return result
-        except:
-            return None
-
-    def _ocr_method_contrast_enhanced(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Улучшение контраста с помощью CLAHE."""
-        try:
-            import pytesseract
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-
-            clahe_configs = [
-                (2.0, (8, 8)),
-                (3.0, (8, 8)),
-                (4.0, (8, 8)),
-                (2.0, (16, 16)),
-            ]
-
-            for clip_limit, tile_grid_size in clahe_configs:
-                clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
-                enhanced = clahe.apply(gray)
-
-                for threshold in [130, 160, 190]:
-                    _, binary = cv2.threshold(enhanced, threshold, 255, cv2.THRESH_BINARY)
-                    result = self._process_with_tesseract(binary, variants, scale=2)
-                    if result:
-                        return result
-
-                    _, binary_inv = cv2.threshold(enhanced, threshold, 255, cv2.THRESH_BINARY_INV)
-                    result = self._process_with_tesseract(binary_inv, variants, scale=2)
-                    if result:
-                        return result
-            return None
-        except:
-            return None
-
-    def _ocr_method_morphological(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Морфологическая обработка."""
-        try:
-            import pytesseract
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-            _, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
-
-            kernels = [
-                np.ones((2, 2), np.uint8),
-                np.ones((3, 3), np.uint8),
-                cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)),
-                cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)),
-            ]
-
-            for kernel in kernels:
-                closed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
-                result = self._process_with_tesseract(closed, variants, scale=2)
-                if result:
-                    return result
-
-                opened = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
-                result = self._process_with_tesseract(opened, variants, scale=2)
-                if result:
-                    return result
-            return None
-        except:
-            return None
-
-    def _ocr_method_color_isolation(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Изоляция определенных цветов."""
-        try:
-            import pytesseract
+            # Конвертируем в HSV для лучшего выделения белого цвета
             hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
-            white_ranges = [
-                ([0, 0, 180], [255, 30, 255]),
-                ([0, 0, 200], [255, 50, 255]),
-                ([0, 0, 150], [255, 40, 255]),
-            ]
+            # Маска для белого цвета
+            lower_white = np.array([0, 0, 180])
+            upper_white = np.array([255, 30, 255])
+            white_mask = cv2.inRange(hsv, lower_white, upper_white)
 
-            for lower, upper in white_ranges:
-                lower = np.array(lower)
-                upper = np.array(upper)
-                mask = cv2.inRange(hsv, lower, upper)
-                result = self._process_with_tesseract(mask, variants, scale=2)
-                if result:
-                    return result
+            # Сохраняем для отладки
+            if self.debug_mode and self.attempt_counter % 20 == 1:
+                self._save_debug_image(white_mask, f"white_mask_{self.attempt_counter}.png")
 
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-            light_mask = gray > 180
-            light_binary = np.where(light_mask, 255, 0).astype(np.uint8)
-            result = self._process_with_tesseract(light_binary, variants, scale=2)
-            return result
-        except:
+            config = '--psm 7 --oem 3'
+            text = pytesseract.image_to_string(white_mask, lang='rus+eng', config=config).strip()
+
+            if self._is_skip_text(text):
+                return (roi.shape[1] // 2, roi.shape[0] // 2)
+
             return None
 
-    def _ocr_method_edge_detection(self, roi: np.ndarray, variants: List[str]) -> Optional[Tuple[int, int]]:
-        """Выделение границ символов."""
-        try:
-            import pytesseract
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-
-            canny_configs = [
-                (50, 150),
-                (30, 100),
-                (100, 200),
-            ]
-
-            for low, high in canny_configs:
-                edges = cv2.Canny(gray, low, high)
-                kernel = np.ones((2, 2), np.uint8)
-                dilated = cv2.dilate(edges, kernel, iterations=1)
-                result = self._process_with_tesseract(dilated, variants, scale=2)
-                if result:
-                    return result
-            return None
-        except:
+        except Exception as e:
+            self.logger.debug(f"Ошибка в методе поиска по цвету: {e}")
             return None
 
-    def _process_with_tesseract(self, processed_image: np.ndarray, variants: List[str],
-                                scale: int = 1) -> Optional[Tuple[int, int]]:
+    def _is_skip_text(self, text: str) -> bool:
         """
-        Обработка изображения с помощью Tesseract.
+        Проверка является ли текст кнопкой пропустить.
 
         Args:
-            processed_image: обработанное изображение
-            variants: список вариантов текста для поиска
-            scale: коэффициент увеличения изображения
+            text: распознанный текст
 
         Returns:
-            tuple: (x, y) координаты центра найденного текста или None
-        """
-        try:
-            import pytesseract
-            import re
-
-            # Увеличиваем изображение для лучшего распознавания
-            if scale > 1:
-                h, w = processed_image.shape
-                processed_image = cv2.resize(processed_image, (w * scale, h * scale),
-                                             interpolation=cv2.INTER_CUBIC)
-
-            # Разные конфигурации PSM для Tesseract
-            psm_configs = [
-                '--psm 6',  # Uniform block of text
-                '--psm 8',  # Single word
-                '--psm 7',  # Single text line
-                '--psm 13',  # Raw line
-            ]
-
-            for psm in psm_configs:
-                try:
-                    config = f"{psm} -c tessedit_char_whitelist=АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>»"
-
-                    data = pytesseract.image_to_data(processed_image, output_type=pytesseract.Output.DICT,
-                                                     lang='rus+eng', config=config)
-
-                    result = self._parse_tesseract_results(data, variants, scale)
-                    if result:
-                        return result
-                except:
-                    continue
-
-            return None
-        except:
-            return None
-
-    def _parse_tesseract_results(self, data: dict, variants: List[str],
-                                 scale: int) -> Optional[Tuple[int, int]]:
-        """
-        Парсинг результатов Tesseract с интеллектуальным поиском.
-
-        Args:
-            data: данные от Tesseract
-            variants: список вариантов для поиска
-            scale: коэффициент масштабирования
-
-        Returns:
-            tuple: (x, y) координаты центра или None
+            bool: True если это кнопка пропустить
         """
         import re
 
-        # Собираем все найденные тексты с их координатами
-        found_texts = []
-        for i in range(len(data['text'])):
-            text = data['text'][i].strip()
-            confidence = int(data['conf'][i])
+        if not text:
+            return False
 
-            if confidence >= 30 and len(text) >= 2:
-                found_texts.append({
-                    'text': text.upper(),
-                    'confidence': confidence,
-                    'left': data['left'][i] // scale,
-                    'top': data['top'][i] // scale,
-                    'width': data['width'][i] // scale,
-                    'height': data['height'][i] // scale,
-                })
+        # Удаляем лишние символы и приводим к верхнему регистру
+        clean_text = re.sub(r'[^\w>»]', '', text.upper())
 
-        # Сначала ищем точные совпадения
-        for variant in variants:
-            variant_upper = variant.upper()
-            for item in found_texts:
-                if item['text'] == variant_upper:
-                    x = item['left'] + item['width'] // 2
-                    y = item['top'] + item['height'] // 2
-                    return (x, y)
+        # Проверяем точные совпадения
+        for variant in self.skip_variants:
+            clean_variant = re.sub(r'[^\w>»]', '', variant.upper())
+            if clean_variant == clean_text:
+                self.logger.debug(f"✅ Найдено точное совпадение: '{text}' -> '{variant}'")
+                return True
 
-        # Затем ищем частичные совпадения для высокой уверенности
-        for variant in variants:
-            variant_upper = variant.upper()
-            variant_clean = re.sub(r'[^А-ЯЁA-Z0-9]', '', variant_upper)
+        # Проверяем частичные совпадения для длинного текста
+        if len(clean_text) >= 6:  # Минимальная длина для "ПРОПУСТИТЬ"
+            for variant in ["ПРОПУСТИТЬ", "SKIP"]:
+                if variant in clean_text:
+                    self.logger.debug(f"✅ Найдено частичное совпадение: '{text}' содержит '{variant}'")
+                    return True
 
-            for item in found_texts:
-                if item['confidence'] >= 50:
-                    text_clean = re.sub(r'[^А-ЯЁA-Z0-9]', '', item['text'])
+        # Проверяем стрелки
+        if '>>' in text or '»' in text:
+            self.logger.debug(f"✅ Найдены стрелки: '{text}'")
+            return True
 
-                    if (variant_clean in text_clean or text_clean in variant_clean) and len(text_clean) >= 3:
-                        x = item['left'] + item['width'] // 2
-                        y = item['top'] + item['height'] // 2
-                        return (x, y)
+        return False
 
-        # Особая обработка для стрелок ">>"
-        for item in found_texts:
-            text_clean = re.sub(r'[^>»]', '', item['text'])
-            if len(text_clean) >= 2:
-                x = item['left'] + item['width'] // 2
-                y = item['top'] + item['height'] // 2
-                return (x, y)
+    def _save_debug_image(self, image: np.ndarray, filename: str):
+        """Сохранение изображения для отладки."""
+        if not self.debug_mode:
+            return
 
-        return None
+        try:
+            filepath = self.debug_dir / filename
+            cv2.imwrite(str(filepath), image)
+            self.logger.debug(f"💾 Сохранено отладочное изображение: {filepath}")
+        except Exception as e:
+            self.logger.debug(f"Ошибка сохранения изображения: {e}")
+
+    def get_statistics(self) -> dict:
+        """
+        Получение статистики работы поисковика.
+
+        Returns:
+            dict: статистика
+        """
+        avg_time = (self.total_search_time / self.successful_searches) if self.successful_searches > 0 else 0
+
+        return {
+            'total_attempts': self.attempt_counter,
+            'successful_searches': self.successful_searches,
+            'total_search_time': self.total_search_time,
+            'average_search_time': avg_time,
+            'success_rate': (self.successful_searches / max(1, self.attempt_counter)) * 100,
+            'ocr_available': self.ocr_available,
+            'debug_mode': self.debug_mode
+        }
+
+    def reset_statistics(self):
+        """Сброс статистики."""
+        self.attempt_counter = 0
+        self.total_search_time = 0
+        self.successful_searches = 0
+        self.logger.info("📊 Статистика поисковика сброшена")
+
+    def enable_debug_mode(self):
+        """Включение режима отладки."""
+        self.debug_mode = True
+        if not self.debug_dir.exists():
+            self.debug_dir.mkdir(exist_ok=True)
+        self.logger.info("🐛 Режим отладки включен")
+
+    def disable_debug_mode(self):
+        """Отключение режима отладки."""
+        self.debug_mode = False
+        self.logger.info("Режим отладки отключен")

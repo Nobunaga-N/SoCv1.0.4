@@ -97,8 +97,8 @@ SEASONS = {
 OCR_REGIONS = {
     'seasons': (150, 150, 220, 400),
     'servers': (400, 130, 570, 470),
-    'skip_button': (900, 0, 380, 100),
-    'skip_button_extended': (800, 0, 480, 120)
+    'skip_button': (1000, 20, 260, 80),
+    'skip_button_extended': (900, 15, 360, 90)
 }
 
 # Варианты текста кнопки ПРОПУСТИТЬ
