@@ -18,6 +18,63 @@ from config.settings import validate_config
 from utils.validators import validate_server_range, validate_step_number
 
 
+def open_terminal_if_needed():
+    """
+    Открывает новый терминал, если программа запущена не из терминала.
+    Использует PowerShell на Windows вместо CMD.
+    """
+    import os
+    import sys
+    import platform
+    import subprocess
+    import shutil
+
+    # Проверяем, запущена ли программа уже из терминала
+    is_terminal = os.isatty(sys.stdout.fileno()) if hasattr(sys.stdout, 'fileno') else False
+
+    if not is_terminal:
+        logger = logging.getLogger('sea_conquest_bot.main')
+        logger.info("Открываем терминал для вывода логов")
+
+        system = platform.system()
+        try:
+            # Получаем абсолютный путь к скрипту
+            script_path = os.path.abspath(sys.argv[0])
+
+            if system == 'Windows':
+                # Определяем, использовать pwsh (PowerShell Core) или powershell (Windows PowerShell)
+                powershell_exe = 'pwsh.exe' if shutil.which('pwsh.exe') else 'powershell.exe'
+
+                # Формируем команду для PowerShell
+                # Используем -NoExit, чтобы окно оставалось открытым после выполнения скрипта
+                # Используем -Command для запуска нашего скрипта
+                command = f'python "{script_path}" {" ".join(sys.argv[1:])}'
+                subprocess.Popen([powershell_exe, '-NoExit', '-Command', command],
+                                 creationflags=subprocess.CREATE_NEW_CONSOLE)
+            elif system == 'Darwin':  # macOS
+                # Открываем Terminal с командой запуска скрипта
+                applescript = (
+                    f'tell application "Terminal" to do script "cd {os.path.dirname(script_path)} && '
+                    f'python3 {script_path} {" ".join(sys.argv[1:])}"'
+                )
+                subprocess.Popen(['osascript', '-e', applescript])
+            else:  # Linux и другие Unix-подобные
+                # Пробуем различные терминалы
+                terminals = ['gnome-terminal', 'xterm', 'konsole', 'terminator']
+                for terminal in terminals:
+                    try:
+                        subprocess.Popen([terminal, '--', 'python3', script_path] + sys.argv[1:])
+                        break
+                    except FileNotFoundError:
+                        continue
+
+            # Завершаем текущий процесс, так как новый запущен в терминале
+            sys.exit(0)
+
+        except Exception as e:
+            print(f"Ошибка при открытии терминала: {e}")
+
+
 def parse_arguments():
     """Парсинг аргументов командной строки."""
     parser = argparse.ArgumentParser(
@@ -268,6 +325,9 @@ def get_user_input():
 def main():
     """Главная функция запуска бота."""
     print(safe_log_message("🌊 Запуск бота Sea of Conquest...", "Запуск бота Sea of Conquest..."))
+
+    # Проверяем необходимость открытия терминала
+    open_terminal_if_needed()
 
     # Парсинг аргументов командной строки
     args = parse_arguments()

@@ -88,7 +88,7 @@ class OptimizedGameBot:
         Запуск бота на выполнение циклов обучения.
 
         Args:
-            cycles: количество циклов
+            cycles: количество циклов (повторений всего диапазона серверов)
             start_server: начальный сервер
             end_server: конечный сервер
             first_server_start_step: начальный шаг для первого сервера
@@ -105,47 +105,60 @@ class OptimizedGameBot:
 
         # Подготовка к выполнению
         successful_cycles = 0
-        current_server = start_server
-        servers_to_process = min(cycles, start_server - end_server + 1)
+        servers_in_range = start_server - end_server + 1
+        total_servers_to_process = servers_in_range * cycles
 
-        self.logger.info(f"📋 Будет обработано {servers_to_process} серверов")
+        self.logger.info(f"📋 Всего серверов в диапазоне: {servers_in_range}")
+        self.logger.info(f"📋 Всего будет обработано: {total_servers_to_process} серверов")
 
         # Основной цикл выполнения
-        for cycle in range(1, servers_to_process + 1):
-            cycle_start_time = time.time()
-            self.logger.info(f"🔄 Цикл {cycle}/{servers_to_process}, сервер {current_server}")
+        total_count = 0
+        for cycle in range(1, cycles + 1):
+            current_server = start_server  # Начинаем с верхней границы диапазона в каждом цикле
 
-            try:
-                # Определяем начальный шаг (только для первого сервера используем custom шаг)
-                current_step = first_server_start_step if cycle == 1 else 1
+            self.logger.info(f"🔄 Начало цикла {cycle}/{cycles}")
 
-                self.logger.info(f"📍 Начальный шаг: {current_step}")
+            # Проходим по всем серверам в текущем цикле
+            while current_server >= end_server:
+                total_count += 1
+                cycle_start_time = time.time()
+                self.logger.info(
+                    f"🔄 Обработка {total_count}/{total_servers_to_process}, сервер {current_server}, цикл {cycle}/{cycles}")
 
-                # Выполняем обучение
-                if self.perform_tutorial(current_server, start_step=current_step):
-                    successful_cycles += 1
-                    cycle_time = time.time() - cycle_start_time
-                    self.logger.info(f"✅ Цикл {cycle} завершен успешно за {cycle_time:.1f}с")
-                else:
-                    self.logger.error(f"❌ Ошибка в цикле {cycle}")
+                try:
+                    # Определяем начальный шаг (только для первого сервера в первом цикле используем custom шаг)
+                    current_step = first_server_start_step if (cycle == 1 and current_server == start_server) else 1
 
-                # Переход к следующему серверу
-                if cycle < servers_to_process:
+                    self.logger.info(f"📍 Начальный шаг: {current_step}")
+
+                    # Выполняем обучение
+                    if self.perform_tutorial(current_server, start_step=current_step):
+                        successful_cycles += 1
+                        cycle_time = time.time() - cycle_start_time
+                        self.logger.info(f"✅ Сервер {current_server} завершен успешно за {cycle_time:.1f}с")
+                    else:
+                        self.logger.error(f"❌ Ошибка на сервере {current_server}")
+
+                    # Переход к следующему серверу
                     current_server -= 1
-                    if current_server < end_server:
-                        self.logger.warning(f"⚠️  Достигнут конечный сервер {end_server}")
-                        break
 
-                    # Пауза между циклами для стабильности
-                    self.logger.info(f"⏳ Пауза {DEFAULT_TIMEOUT * 4}с между циклами...")
-                    time.sleep(DEFAULT_TIMEOUT * 4)
+                    # Пауза между серверами для стабильности
+                    if current_server >= end_server:
+                        self.logger.info(f"⏳ Пауза {DEFAULT_TIMEOUT * 2}с между серверами...")
+                        time.sleep(DEFAULT_TIMEOUT * 2)
 
-            except Exception as e:
-                self.logger.error(f"💥 Критическая ошибка в цикле {cycle}: {e}", exc_info=True)
+                except Exception as e:
+                    self.logger.error(f"💥 Критическая ошибка на сервере {current_server}: {e}", exc_info=True)
+                    current_server -= 1  # Переходим к следующему серверу даже при ошибке
+
+            # Пауза между циклами
+            if cycle < cycles:
+                self.logger.info(f"⏳ Пауза {DEFAULT_TIMEOUT * 4}с между циклами...")
+                time.sleep(DEFAULT_TIMEOUT * 4)
 
         # Итоговая статистика
-        success_rate = (successful_cycles / servers_to_process) * 100 if servers_to_process > 0 else 0
-        self.logger.info(f"📊 Итог: {successful_cycles}/{servers_to_process} циклов ({success_rate:.1f}%)")
+        success_rate = (successful_cycles / total_servers_to_process) * 100 if total_servers_to_process > 0 else 0
+        self.logger.info(f"📊 Итог: {successful_cycles}/{total_servers_to_process} серверов ({success_rate:.1f}%)")
 
         return successful_cycles
 
