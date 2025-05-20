@@ -91,6 +91,10 @@ class TutorialExecutor:
                 self.logger.info(f"Условие для шага {step.step_number} не выполнено, пропускаем")
                 return True
 
+            # Используем новую функцию log_step вместо обычного логирования
+            from core.logger import log_step
+            log_step(self.logger, step.step_number, step.description)
+
             # Выполняем шаг согласно его типу
             action_method = getattr(self, f'_action_{step.action_type}', None)
             if not action_method:
@@ -102,10 +106,21 @@ class TutorialExecutor:
             if step.action_type == 'select_server' and server_id:
                 params['server_id'] = server_id
 
-            return action_method(**params)
+            success = action_method(**params)
+
+            # Логируем результат выполнения шага с цветным выделением
+            from core.logger import log_success, log_failure
+            if success:
+                log_success(self.logger, f"Шаг {step.step_number}: ВЫПОЛНЕН")
+            else:
+                log_failure(self.logger, f"Шаг {step.step_number}: НЕ ВЫПОЛНЕН")
+
+            return success
 
         except Exception as e:
-            self.logger.error(f"Ошибка выполнения шага {step.step_number}: {e}", exc_info=True)
+            from core.logger import log_failure
+            log_failure(self.logger, f"Ошибка выполнения шага {step.step_number}: {e}")
+            self.logger.error(f"Подробности: ", exc_info=True)
             return False
 
     # Методы действий для различных типов шагов

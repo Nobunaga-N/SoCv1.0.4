@@ -239,20 +239,25 @@ def run_test_mode(args, game_bot):
         game_bot: экземпляр бота
     """
     logger = logging.getLogger('sea_conquest_bot.main')
+    from core.logger import log_section, log_success, log_failure
 
     if args.test_server:
-        logger.info(safe_log_message(f"🧪 Тестирование выбора сервера {args.test_server}",
-                                   f"ТЕСТ: Тестирование выбора сервера {args.test_server}"))
+        log_section(logger, f"ТЕСТ ВЫБОРА СЕРВЕРА {args.test_server}")
         result = game_bot.test_server_selection(args.test_server)
-        status = safe_log_message("✅ Успех", "УСПЕХ") if result else safe_log_message("❌ Неудача", "НЕУДАЧА")
-        print(f"Результат тестирования: {status}")
+        if result:
+            log_success(logger, f"Выбор сервера {args.test_server} выполнен успешно")
+        else:
+            log_failure(logger, f"Не удалось выбрать сервер {args.test_server}")
+        print(f"Результат тестирования: {'УСПЕХ' if result else 'НЕУДАЧА'}")
 
     if args.test_skip:
-        logger.info(safe_log_message("🧪 Тестирование поиска кнопки ПРОПУСТИТЬ",
-                                   "ТЕСТ: Тестирование поиска кнопки ПРОПУСТИТЬ"))
+        log_section(logger, "ТЕСТ ПОИСКА КНОПКИ ПРОПУСТИТЬ")
         result = game_bot.test_skip_button_search()
-        status = safe_log_message("✅ Кнопка найдена", "УСПЕХ: Кнопка найдена") if result else safe_log_message("❌ Кнопка не найдена", "НЕУДАЧА: Кнопка не найдена")
-        print(f"Результат тестирования: {status}")
+        if result:
+            log_success(logger, "Кнопка ПРОПУСТИТЬ найдена")
+        else:
+            log_failure(logger, "Кнопка ПРОПУСТИТЬ не найдена")
+        print(f"Результат тестирования: {'УСПЕХ' if result else 'НЕУДАЧА'}")
 
     if args.test_step:
         logger.info(safe_log_message(f"🧪 Тестирование выполнения шага {args.test_step}",
