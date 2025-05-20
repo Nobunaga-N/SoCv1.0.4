@@ -325,7 +325,26 @@ class TutorialExecutor:
             self._click_server_at_coordinates(coords)
             return True
 
-        # Основной цикл скроллинга
+        # Проверяем, есть ли в видимой области ближайшие к целевому серверы
+        # Если у нас уже видны сервера как выше, так и ниже целевого - выбираем сразу
+        if current_servers_list:
+            min_server = min(current_servers_list)
+            max_server = max(current_servers_list)
+
+            if min_server < server_id < max_server:
+                self.logger.info(
+                    f"Сервер {server_id} не найден, но находится между видимыми серверами {min_server} и {max_server}")
+                # Выбираем ближайший сервер НИЖЕ целевого
+                lower_servers = [s for s in current_servers_list if s < server_id]
+                if lower_servers:
+                    closest_lower = max(lower_servers)  # Ближайший снизу
+                    difference = server_id - closest_lower
+                    self.logger.info(f"Выбираем ближайший сервер НИЖЕ: {closest_lower} (разница: {difference})")
+                    coords = current_servers[closest_lower]
+                    self._click_server_at_coordinates(coords)
+                    return True
+
+        # Основной цикл скроллинга - выполняем до 10 попыток, если не нашли ближайшие серверы
         max_attempts = 10
         for attempt in range(max_attempts):
             self.logger.info(f"Попытка скроллинга {attempt + 1}/{max_attempts}")
@@ -352,18 +371,49 @@ class TutorialExecutor:
                     self._click_server_at_coordinates(coords)
                     return True
 
+                # Проверяем, есть ли уже сервера по обе стороны от целевого
+                min_server = min(current_servers_list)
+                max_server = max(current_servers_list)
+
+                if min_server < server_id < max_server:
+                    self.logger.info(
+                        f"После скроллинга найдены сервера по обе стороны от {server_id}: {min_server}-{max_server}")
+                    # Выбираем ближайший сервер НИЖЕ целевого
+                    lower_servers = [s for s in current_servers_list if s < server_id]
+                    if lower_servers:
+                        closest_lower = max(lower_servers)  # Ближайший снизу
+                        difference = server_id - closest_lower
+                        self.logger.info(f"Выбираем ближайший сервер НИЖЕ: {closest_lower} (разница: {difference})")
+                        coords = new_servers[closest_lower]
+                        self._click_server_at_coordinates(coords)
+                        return True
+
             current_servers = new_servers
 
-        # Если не удалось найти точный сервер, пробуем найти ближайший
+        # Если не удалось найти точный сервер, выбираем ближайший НИЖЕ
         if current_servers_list:
-            closest = min(current_servers_list, key=lambda s: abs(s - server_id))
-            difference = abs(closest - server_id)
+            # Ищем сервера с номерами НИЖЕ целевого
+            lower_servers = [s for s in current_servers_list if s < server_id]
 
-            if difference <= 3:  # Допустимая разница
-                self.logger.info(f"Выбираем ближайший сервер {closest} (разница: {difference})")
+            if lower_servers:
+                # Берем максимальный из серверов ниже целевого (т.е. ближайший)
+                closest_lower = max(lower_servers)
+                difference = server_id - closest_lower
+                self.logger.info(f"Выбираем ближайший сервер НИЖЕ: {closest_lower} (разница: {difference})")
                 final_servers = self.server_selector.get_servers_with_coordinates()
-                if closest in final_servers:
-                    coords = final_servers[closest]
+                if closest_lower in final_servers:
+                    coords = final_servers[closest_lower]
+                    self._click_server_at_coordinates(coords)
+                    return True
+            else:
+                # Если серверов ниже нет, берем минимальный из доступных
+                min_server = min(current_servers_list)
+                difference = server_id - min_server
+                self.logger.info(
+                    f"Нет серверов ниже {server_id}, выбираем наименьший: {min_server} (разница: {difference})")
+                final_servers = self.server_selector.get_servers_with_coordinates()
+                if min_server in final_servers:
+                    coords = final_servers[min_server]
                     self._click_server_at_coordinates(coords)
                     return True
 
