@@ -396,362 +396,355 @@ class TutorialSteps:
             params={"image_key": "step_46", "max_attempts": 20}
         ))
 
-        # Шаг 47: Дожидаемся скипа
+        # Шаг 47: Дожидаемся корабля (ИЗМЕНЕНО)
         steps.append(TutorialStep(
             step_number=47,
-            description="Продолжаем кликать по центру экрана, пока не увидим step_27, когда находим кликаем 1169:42 (скип)",
-            action_type="wait_for_battle_ready",
-            params={"image_key": "step_27", "max_attempts": 30}
+            description="Продолжаем кликать по центру экрана, пока не увидим step_48, когда находим кликаем 136:283",
+            action_type="wait_for_ship",
+            params={"image_key": "step_48", "click_x": 136, "click_y": 283, "max_attempts": 30}
         ))
 
-        # Шаг 48: Добавленный новый шаг - Пропустить
+        # Шаг 48: Пропустить (ранее был шаг 50)
         steps.append(TutorialStep(
             step_number=48,
-            description="Ждем изображения step_21, когда находим кликаем 1169:42 (скип)",
-            action_type="click_with_image_check_and_wait",
-            params={"image_key": "step_21", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 0.25}
-        ))
-
-        # Шаг 49: Дожидаемся корабля (ранее был шаг 48)
-        steps.append(TutorialStep(
-            step_number=49,
-            description="Ждем изображения step_48, когда находим кликаем 136:283 (Дожидаемся корабля)",
-            action_type="click_with_image_check_and_wait",
-            params={"image_key": "step_48", "x": 136, "y": 283, "image_timeout": 40, "wait_after": 0.25}
-        ))
-
-        # Шаг 50: Пропустить (ранее был шаг 49)
-        steps.append(TutorialStep(
-            step_number=50,
             description="Ждем изображения step_27, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 51: Активируем следующий этап квеста (ранее был шаг 50)
+        # Шаг 49: Активируем следующий этап квеста (ранее был шаг 51)
         steps.append(TutorialStep(
-            step_number=51,
+            step_number=49,
             description="Ждем изображения step_50, когда находим кликаем 136:283 (Активируем следующий этап квеста)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_50", "x": 136, "y": 283, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 52: Пропустить (ранее был шаг 51)
+        # Шаг 50: Пропустить (ранее был шаг 52)
         steps.append(TutorialStep(
-            step_number=52,
+            step_number=50,
             description="Ждем изображения step_27, когда находим кликаем 1169:42, тайм слип 3 сек (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 3.5}
         ))
 
-        # Шаг 53: Активация черепа (ранее был шаг 52)
+        # Шаг 51: Активация черепа (ранее был шаг 53)
         steps.append(TutorialStep(
-            step_number=53,
+            step_number=51,
             description="клик 653:403 (Активируем череп в заливе мертвецов)",
             action_type="click_coord_with_delay_and_wait",
             params={"x": 653, "y": 403, "delay": 0, "wait_after": 1.0}
         ))
 
-        # Шаг 54: Пропустить (ранее был шаг 53)
+        # Шаг 52: Пропустить (ранее был шаг 54)
         steps.append(TutorialStep(
-            step_number=54,
+            step_number=52,
             description="Ждем изображения step_18, когда находим кликаем 1169:42,тайм слип 2 сек (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_18", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 2.0}
         ))
 
-        # Шаг 55: Пропустить (ранее был шаг 54)
+        # Шаг 53: Пропустить (ранее был шаг 55)
         steps.append(TutorialStep(
-            step_number=55,
+            step_number=53,
             description="Ждем изображения step_18, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_18", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 2.0}
         ))
 
-        # Шаг 56: Пропустить (ранее был шаг 55)
+        # Шаг 54: Пропустить (ранее был шаг 56)
         steps.append(TutorialStep(
-            step_number=56,
+            step_number=54,
             description="Ждем изображения step_55, когда находим кликаем 1169:42, тайм слип 2 сек (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_55", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 2.5}
         ))
 
-        # Шаг 57: Пропустить (ранее был шаг 56)
+        # Шаг 55: Пропустить (ранее был шаг 57)
         steps.append(TutorialStep(
-            step_number=57,
+            step_number=55,
             description="Ждем изображения step_55, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_55", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 2.0}
         ))
 
-        # Шаг 58: Пропустить (ранее был шаг 57)
+        # Шаг 56: Пропустить (ранее был шаг 58)
         steps.append(TutorialStep(
-            step_number=58,
+            step_number=56,
             description="Ждем изображения step_21, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_21", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 59: Продолжить квест (ранее был шаг 58)
+        # Шаг 57: Продолжить квест (ранее был шаг 59)
         steps.append(TutorialStep(
-            step_number=59,
+            step_number=57,
             description="Ждем изображения step_48, когда находим кликаем 136:283 (Продолжаем квест - 'покинуть залив мертвецов')",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_48", "x": 136, "y": 283, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 60: Пропустить (ранее был шаг 59)
+        # Шаг 58: Пропустить (ранее был шаг 60)
         steps.append(TutorialStep(
-            step_number=60,
+            step_number=58,
             description="Ждем изображения step_27, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 61: Открытие вкладки корабля (ранее был шаг 60)
+        # Шаг 59: Открытие вкладки корабля (ранее был шаг 61)
         steps.append(TutorialStep(
-            step_number=61,
+            step_number=59,
             description="Ждем изображения step_60, когда находим кликаем 125:283 (Открываем вкладку корабля)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_60", "x": 125, "y": 283, "image_timeout": 40, "wait_after": 1}
         ))
 
-        # Шаг 62: Открытие вкладки построек (ранее был шаг 61)
+        # Шаг 60: Открытие вкладки построек (ранее был шаг 62)
         steps.append(TutorialStep(
-            step_number=62,
+            step_number=60,
             description="Ждем изображения step_61, когда находим кликаем 42:479 (заходим во вкладку построек)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_61", "x": 42, "y": 479, "image_timeout": 40, "wait_after": 1}
         ))
 
-        # Шаг 63: Выбор корабля для улучшения (ранее был шаг 62)
+        # Шаг 61: Выбор корабля для улучшения (ранее был шаг 63)
         steps.append(TutorialStep(
-            step_number=63,
+            step_number=61,
             description="Ждем изображения step_62, когда находим кликаем 127:216 (Выбираем корабль для улучшения)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_62", "x": 127, "y": 216, "image_timeout": 40, "wait_after": 1}
         ))
 
-        # Шаг 64: Улучшение корабля (ранее был шаг 63)
+        # Шаг 62: Улучшение корабля (ранее был шаг 64)
         steps.append(TutorialStep(
-            step_number=64,
+            step_number=62,
             description="Ждем изображения step_63, когда находим кликаем 1079:646, тайм слип 2.5 сек (Улучшаем корабль)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_63", "x": 1079, "y": 646, "image_timeout": 40, "wait_after": 3.5}
         ))
 
-        # Шаг 65: Выход из вкладки корабля (ранее был шаг 64)
+        # Шаг 63: Выход из вкладки корабля (ранее был шаг 65)
         steps.append(TutorialStep(
-            step_number=65,
+            step_number=63,
             description="клик 145:25 (Выходим из вкладки корабля)",
             action_type="click_coord_with_delay_and_wait",
             params={"x": 145, "y": 25, "delay": 0, "wait_after": 2}
         ))
 
-        # Шаг 66: Открытие меню постройки (ранее был шаг 65)
+        # Шаг 64: Открытие меню постройки (ранее был шаг 66)
         steps.append(TutorialStep(
-            step_number=66,
+            step_number=64,
             description="Ждем изображения step_61, когда находим кликаем 639:603 (Открываем меню постройки)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_61", "x": 639, "y": 603, "image_timeout": 40, "wait_after": 1}
         ))
 
-        # Шаг 67: Пропустить (ранее был шаг 66)
+        # Шаг 65: Пропустить (ранее был шаг 67)
         steps.append(TutorialStep(
-            step_number=67,
+            step_number=65,
             description="Ждем изображения step_21, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_21", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 1}
         ))
 
-        # Шаг 68: Открытие компаса (ранее был шаг 67)
+        # Шаг 66: Открытие компаса (ранее был шаг 68)
         steps.append(TutorialStep(
-            step_number=68,
+            step_number=66,
             description="Ждем изображения step_61, когда находим кликаем 1072:87, тайм слип 3 (Открываем вкладку компаса)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_61", "x": 1072, "y": 87, "image_timeout": 40, "wait_after": 9}
         ))
 
-        # Шаг 69: Открытие вкладки строительства (ранее был шаг 68)
+        # Шаг 67: Открытие вкладки строительства (ранее был шаг 69)
         steps.append(TutorialStep(
-            step_number=69,
+            step_number=67,
             description="Ждем изображения step_68, когда находим кликаем 43:481 (открываем вкладку строительства)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_68", "x": 43, "y": 481, "image_timeout": 40, "wait_after": 2}
         ))
 
-        # Шаг 70: Выбор постройки (ранее был шаг 69)
+        # Шаг 68: Выбор постройки (ранее был шаг 70)
         steps.append(TutorialStep(
-            step_number=70,
+            step_number=68,
             description="Ждем изображения step_69, когда находим кликаем 983:405 (выбираем постройку - каюта гребцов)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_69", "x": 983, "y": 405, "image_timeout": 40, "wait_after": 2.5}
         ))
 
-        # Шаг 71: Подтверждение постройки (ранее был шаг 70)
+        # Шаг 69: Подтверждение постройки (ранее был шаг 71)
         steps.append(TutorialStep(
-            step_number=71,
+            step_number=69,
             description="Ждем изображения step_68, когда находим кликаем 676:580, тайм слип 4.5 сек (Подтверждаем постройку каюты гребцов)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_68", "x": 676, "y": 580, "image_timeout": 40, "wait_after": 4.5}
         ))
 
-        # Шаг 72: Активация квеста (ранее был шаг 71)
+        # Шаг 70: Активация квеста (ранее был шаг 72)
         steps.append(TutorialStep(
-            step_number=72,
+            step_number=70,
             description="клик 123:280, тайм слип 3 сек (Активируем квест 'Заполучи кают гребцов: 1')",
             action_type="click_coord_with_delay_and_wait",
             params={"x": 123, "y": 280, "delay": 0, "wait_after": 3.0}
         ))
 
-        # Шаг 73: Открытие вкладки построек (ранее был шаг 72)
+        # Шаг 71: Открытие вкладки построек (ранее был шаг 73)
         steps.append(TutorialStep(
-            step_number=73,
+            step_number=71,
             description="клик 42:479 (открываем вкладку построек)",
             action_type="click_coord_with_delay_and_wait",
             params={"x": 42, "y": 479, "delay": 0, "wait_after": 3}
         ))
 
-        # Шаг 74: Выбор орудийной палубы (ранее был шаг 73)
+        # Шаг 72: Выбор орудийной палубы (ранее был шаг 74)
         steps.append(TutorialStep(
-            step_number=74,
+            step_number=72,
             description="Ждем изображения step_69, когда находим кликаем 687:514 (Выбираем орудийную палубу)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_69", "x": 687, "y": 514, "image_timeout": 40, "wait_after": 3}
         ))
 
-        # Шаг 75: Подтверждение постройки орудийной палубы (ранее был шаг 74)
+        # Шаг 73: Подтверждение постройки орудийной палубы (ранее был шаг 75)
         steps.append(TutorialStep(
-            step_number=75,
+            step_number=73,
             description="Ждем изображения step_68, когда находим кликаем 679:581, тайм слип 4.5 сек (Подтверждаем постройку орудийной палубы)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_68", "x": 679, "y": 581, "image_timeout": 40, "wait_after": 5.5}
         ))
 
-        # Шаг 76: Завершение квеста орудийных палуб (ранее был шаг 75)
+        # Шаг 74: Завершение квеста орудийных палуб (ранее был шаг 76)
         steps.append(TutorialStep(
-            step_number=76,
+            step_number=74,
             description="клик 119:279, тайм слип 2 сек (Завершаем квест орудийных палуб)",
             action_type="click_coord_with_delay_and_wait",
             params={"x": 119, "y": 279, "delay": 0, "wait_after": 3.5}
         ))
 
-        # Новый шаг 77: Нажимаем на квест с компасом
+        # Шаг 75: Нажимаем на квест с компасом (ранее был шаг 77)
         steps.append(TutorialStep(
-            step_number=77,
+            step_number=75,
             description="клик 119:279, тайм слип 2 сек (Нажимаем на квест с компасом)",
             action_type="click_coord_with_delay_and_wait",
             params={"x": 119, "y": 279, "delay": 0, "wait_after": 1.5}
         ))
 
-        # Шаг 78: Открытие компаса (ранее был шаг 77)
+        # Шаг 76: Открытие компаса (ранее был шаг 78)
         steps.append(TutorialStep(
-            step_number=78,
+            step_number=76,
             description="клик 1072:87 (Открываем компас)",
             action_type="click_coord_with_delay_and_wait",
             params={"x": 1072, "y": 87, "delay": 0, "wait_after": 2}
         ))
 
-        # Шаг 79: Активация указателя (ранее был шаг 78)
+        # Шаг 77: Активация указателя (ранее был шаг 79)
         steps.append(TutorialStep(
-            step_number=79,
+            step_number=77,
             description="Ждем изображения step_77, когда находим кликаем 698:273 (Активируем указатель)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_77", "x": 698, "y": 273, "image_timeout": 40, "wait_after": 2}
         ))
 
-        # Шаг 80: Пропустить (ранее был шаг 79)
+        # Шаг 78: Пропустить (ранее был шаг 80)
         steps.append(TutorialStep(
-            step_number=80,
+            step_number=78,
             description="Ждем изображения step_27, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 1}
         ))
 
-        # Шаг 81: Активация компаса над кораблем (ранее был шаг 80)
+        # Шаг 79: Активация компаса над кораблем (ранее был шаг 81)
         steps.append(TutorialStep(
-            step_number=81,
+            step_number=79,
             description="Ждем изображения step_79, когда находим кликаем 652:214 (Активируем компас над кораблем)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_79", "x": 652, "y": 214, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 82: Пропустить (ранее был шаг 81)
+        # Шаг 80: Пропустить (ранее был шаг 82)
         steps.append(TutorialStep(
-            step_number=82,
+            step_number=80,
             description="Ждем изображения step_27, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
-            params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 3.5}
+            params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 4.5}
         ))
 
-        # Шаг 83: Пропустить (ранее был шаг 82)
+        # Шаг 81: Пропустить (ранее был шаг 83)
         steps.append(TutorialStep(
-            step_number=83,
+            step_number=81,
             description="Ждем изображения step_21, когда находим кликаем 1169:42, тайм слип 1 сек (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_21", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 1.5}
         ))
 
-        # Шаг 84: Активация квеста "Богатая добыча" (ранее был шаг 83)
+        # Шаг 82: Пропустить (НОВЫЙ ШАГ)
         steps.append(TutorialStep(
-            step_number=84,
+            step_number=82,
+            description="Ждем изображения step_21, когда находим кликаем 1169:42, тайм слип 1 сек (скип)",
+            action_type="click_with_image_check_and_wait",
+            params={"image_key": "step_21", "x": 1169, "y": 42, "image_timeout": 40, "click_delay": 1.5,
+                    "wait_after": 1.5}
+        ))
+
+        # Шаг 83: Активация квеста "Богатая добыча" (ранее был шаг 82)
+        steps.append(TutorialStep(
+            step_number=83,
             description="Ждем изображения step_82, когда находим кликаем 151:280 (Активируем квест 'Богатая добыча')",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_82", "x": 151, "y": 280, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 85: Пропустить (ранее был шаг 84)
+        # Шаг 84: Пропустить (ранее был шаг 83)
         steps.append(TutorialStep(
-            step_number=85,
+            step_number=84,
             description="Ждем изображения step_27, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 0.5}
         ))
 
-        # Шаг 86: Пропустить (ранее был шаг 85)
+        # Шаг 85: Пропустить (ранее был шаг 84)
         steps.append(TutorialStep(
-            step_number=86,
+            step_number=85,
             description="Ждем изображения step_84, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_84", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 0.25}
         ))
 
-        # Шаг 87: Пропустить (ранее был шаг 86)
+        # Шаг 86: Пропустить (ранее был шаг 85)
         steps.append(TutorialStep(
-            step_number=87,
+            step_number=86,
             description="Ждем изображения step_85, когда находим кликаем 1169:42, тайм слип 1 сек (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_85", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 2.0}
         ))
 
-        # Шаг 88: Пропустить (ранее был шаг 87)
+        # Шаг 87: Пропустить (ранее был шаг 86)
         steps.append(TutorialStep(
-            step_number=88,
+            step_number=87,
             description="Ждем изображения step_85, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_85", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 2.0}
         ))
 
-        # Шаг 89: Сбор монет (ранее был шаг 88)
+        # Шаг 88: Сбор монет (ранее был шаг 87)
         steps.append(TutorialStep(
-            step_number=89,
+            step_number=88,
             description="Ждем изображения step_87, когда находим кликаем 931:620 (Собираем монеты)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_87", "x": 931, "y": 620, "image_timeout": 40, "wait_after": 2.0}
         ))
 
-        # Шаг 90: Пропустить (ранее был шаг 89)
+        # Шаг 89: Пропустить (ранее был шаг 88)
         steps.append(TutorialStep(
-            step_number=90,
+            step_number=89,
             description="Ждем изображения step_88, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_88", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 1.0}
         ))
 
-        # Шаг 91: Пропустить (ранее был шаг 90)
+        # Шаг 90: Пропустить (ранее был шаг 89)
         steps.append(TutorialStep(
-            step_number=91,
-            description="Ждем изображения step_89, когда находим кликаем 1169:42 (скип)",
+            step_number=90,
+            description="Ждем изображения step_89, когда находим кликаем 150:277 (скип)",
             action_type="click_with_image_check_and_wait",
             params={"image_key": "step_89", "x": 150, "y": 277, "image_timeout": 40, "wait_after": 0.25}
         ))
