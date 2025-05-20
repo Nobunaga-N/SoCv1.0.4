@@ -141,7 +141,7 @@ SEASONS = {
 
 # Области для OCR распознавания
 OCR_REGIONS = {
-    'seasons': (150, 150, 220, 400),
+    'seasons': (275, 150, 55, 450),
     'servers': (400, 130, 570, 470),
     'skip_button': (1000, 20, 260, 80),
     'skip_button_extended': (900, 15, 360, 90)
