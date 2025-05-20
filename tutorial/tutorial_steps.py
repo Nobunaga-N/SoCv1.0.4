@@ -673,7 +673,7 @@ class TutorialSteps:
             step_number=81,
             description="Ждем изображения step_27, когда находим кликаем 1169:42 (скип)",
             action_type="click_with_image_check_and_wait",
-            params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 2.5}
+            params={"image_key": "step_27", "x": 1169, "y": 42, "image_timeout": 40, "wait_after": 3.5}
         ))
 
         # Шаг 82: Пропустить (ранее был шаг 81)
